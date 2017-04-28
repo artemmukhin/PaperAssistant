@@ -1,29 +1,22 @@
 package com.team.pusto.paperassistant;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -31,17 +24,8 @@ import com.team.pusto.paperassistant.classifierengine.Classifier;
 import com.team.pusto.paperassistant.classifierengine.Indexer;
 
 import org.opencv.android.Utils;
-import org.opencv.core.Core;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
-import org.opencv.core.MatOfFloat;
-import org.opencv.core.MatOfInt;
-import org.opencv.core.Scalar;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.core.Point;
-import org.opencv.core.Size;
 
 import org.opencv.android.OpenCVLoader;
 
@@ -151,18 +135,88 @@ public class MainActivity extends Activity {
         return BitmapFactory.decodeFile(path, options);
     }
 
+    public void doScienceIndex() {
+        File papersDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Papers");
+        ArrayList<File> filesPapers = new ArrayList<File>(Arrays.asList(papersDir.listFiles()));
+
+        File notPapersDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/NotPapers");
+        ArrayList<File> filesNotPapers = new ArrayList<File>(Arrays.asList(notPapersDir.listFiles()));
+
+        Indexer indexerPaper = new Indexer(true);
+        indexerPaper.addPhotos(filesPapers);
+        indexerPaper.index();
+
+        Indexer indexerNotPaper = new Indexer(false);
+        indexerNotPaper.addPhotos(filesNotPapers);
+        indexerNotPaper.index();
+    }
+
     public void doScience() {
-        File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Papers");
+
+        File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM");
         ArrayList<File> filesAll = new ArrayList<File>(Arrays.asList(photosDir.listFiles()));
-        List<File> files = filesAll.subList(0, 5);
+        //List<File> files = filesAll.subList(0, 5);
+        List<File> files = filesAll;
+
+        File needFile = null;
+        for (File file: files) {
+            if (file.getName().equals("IMG1.jpg")) {
+                needFile = file;
+                break;
+            }
+        }
+
+        List<File> needFileList = new ArrayList<>();
+        needFileList.add(needFile);
+
+        Classifier classifier = new Classifier();
+        classifier.addPhotos(needFileList);
+
+        try {
+            classifier.loadIndexStore(true);
+            classifier.loadIndexStore(false);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Exc", Toast.LENGTH_SHORT).show();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Exc", Toast.LENGTH_SHORT).show();
+        }
+        finally {
+            Toast.makeText(this, "finally", Toast.LENGTH_SHORT).show();
+        }
+
+        Toast.makeText(this, "get", Toast.LENGTH_SHORT).show();
+
+        List<File> paperFiles = classifier.getPapers();
+        String s;
+        if (paperFiles.size() == 1)
+            s = "Paper";
+        else
+            s = "Not paper";
+
+        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
 
         //Classifier classifier = new Classifier();
         //classifier.addPhotos(files);
         //List<File> paperFiles = classifier.getPapers();
 
+        /*
         Indexer indexer = new Indexer(true);
         indexer.addPhotos(files);
         indexer.index();
+        */
+
+/*
+        Classifier classifier = new Classifier();
+        try {
+            classifier.loadIndexStore(true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+*/
 
         Bitmap bmp = decodeSampledBitmapFromFile(files.get(0).getAbsolutePath(), 200, 200);
         Mat imageMat = new Mat();

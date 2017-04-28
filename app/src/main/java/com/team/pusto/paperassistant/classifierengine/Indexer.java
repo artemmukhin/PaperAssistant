@@ -2,15 +2,9 @@ package com.team.pusto.paperassistant.classifierengine;
 
 import android.os.Environment;
 
-import org.opencv.core.Core;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfFloat;
-import org.opencv.core.MatOfInt;
-import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -18,6 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Indexer {
+
+    final static String indexPaperStorePath = Environment.getExternalStorageDirectory() + "/DCIM/paper_store";
+    final static String indexNotPaperStorePath = Environment.getExternalStorageDirectory() + "/DCIM/notpaper_store";
+
     private List<Photo> photos;
     private boolean isPaper;
 
@@ -38,12 +36,14 @@ public class Indexer {
         for (Photo photo: photos) {
             Mat image = photo.getImageMat();
             HSVHistogram histogram = new HSVHistogram(image);
+            histogram.setCheck(isPaper);
+
             histograms.add(histogram);
         }
 
         HistogramsArray store = new HistogramsArray(histograms);
         try {
-            store.serialize();
+            store.serialize(isPaper);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -57,8 +57,17 @@ class HistogramsArray implements java.io.Serializable {
         this.histograms = histograms;
     }
 
-    public void serialize() throws IOException {
-        FileOutputStream fos = new FileOutputStream(Environment.getExternalStorageDirectory() + "/DCIM/index_store");
+    public ArrayList<HSVHistogram> getHistograms() {
+        return this.histograms;
+    }
+
+    public void serialize(boolean isPaper) throws IOException {
+        FileOutputStream fos;
+        if (isPaper)
+            fos = new FileOutputStream(Indexer.indexPaperStorePath);
+        else
+            fos = new FileOutputStream(Indexer.indexNotPaperStorePath);
+
         ObjectOutputStream oos = new ObjectOutputStream(fos);
         oos.writeObject(this);
         oos.flush();

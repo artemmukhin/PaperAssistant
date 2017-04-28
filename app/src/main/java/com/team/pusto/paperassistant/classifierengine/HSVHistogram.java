@@ -10,12 +10,15 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HSVHistogram {
+public class HSVHistogram implements java.io.Serializable {
     final static double EPS = 1e-8;
 
     private float[] firstHist;
     private float[] secondHist;
     private float[] thirdHist;
+
+    boolean isChecked = false;
+    Boolean isPaper = null;
 
     public HSVHistogram(Mat image) {
         Imgproc.cvtColor(image, image, Imgproc.COLOR_RGB2HSV);
@@ -97,5 +100,10 @@ public class HSVHistogram {
         
         return d1 + d2 + d3;
         // compareHist(h1.firstHist, h2.firstHist, Imgproc.CV_COMP_CHISQR);
+    }
+
+    public void setCheck(boolean isPaper) {
+        this.isChecked = true;
+        this.isPaper = isPaper;
     }
 }
