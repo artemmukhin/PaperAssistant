@@ -1,6 +1,7 @@
 package com.team.pusto.paperassistant;
 
 import android.Manifest;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
@@ -44,6 +45,9 @@ public class Gallery extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
+
+        //Debug.waitForDebugger();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -70,20 +74,28 @@ public class Gallery extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 ImageItem item = getItem(position);
                 //Create intent
-                Intent intent = new Intent(Gallery.this, Preview.class);
+                Intent intent = new Intent(getApplicationContext(), Preview.class);
                 intent.putExtra("title", item.getTitle());
                 intent.putExtra("image", item.getImage());
-
+                //intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), (int)id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                Toast.makeText(Gallery.this, "beforeStartingActivity", Toast.LENGTH_LONG).show();
                 //Start details activity
-                startActivity(intent);
+                try {
+                    startActivity(intent);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
         getData();
         //ImageView imageView = (ImageView) findViewById(R.id.ImageView);
+
         gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
+                Toast.makeText(Gallery.this, "Yay", Toast.LENGTH_SHORT).show();
                 return true;
             }
         });
@@ -115,7 +127,7 @@ public class Gallery extends AppCompatActivity {
 
         thread = new Thread(new Runnable() {
             public void run() {
-                Debug.waitForDebugger();
+                //Debug.waitForDebugger();
                 File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Camera");
 
                 ArrayList<File> allFiles = new ArrayList<>(Arrays.asList(photosDir.listFiles()));
@@ -135,7 +147,8 @@ public class Gallery extends AppCompatActivity {
                     Bitmap bmp = Bitmap.createBitmap(200, 200, conf); // this creates a MUTABLE bitmap;
                     imageItems.add(new ImageItem(bmp, "Images are not found!"));
                 } else {
-                    for (int i = 0; i < paperFiles.size(); i++) {
+                    //paperFiles.size()
+                    for (int i = 0; i < 20; i++) {
                         Bitmap bmp = decodeSampledBitmapFromFile(files.get(i).getAbsolutePath(), 200, 200);
                         if (files.get(i).getName().indexOf(".jpg") > 0 || files.get(i).getName().indexOf(".JPG") > 0)
                             imageItems.add(new ImageItem(bmp, "Image#" + i));
@@ -151,7 +164,14 @@ public class Gallery extends AppCompatActivity {
             }
         });
 
+
         thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e){
+
+        }
+
 
 //
 //        ProgressDialog dialog = new ProgressDialog(this); // this = YourActivity
@@ -172,7 +192,7 @@ public class Gallery extends AppCompatActivity {
     private ImageItem getItem(int i) {
         Bitmap bmp = decodeSampledBitmapFromFile(files.get(i).getAbsolutePath(), 600, 600);
         ImageItem im = new ImageItem(bmp, "Image#" + i);
-        Toast.makeText(this, getFileName(i), Toast.LENGTH_LONG).show();
+        Toast.makeText(this, getFileName(i), Toast.LENGTH_SHORT).show();
         return im;
     }
     private String getFileName(int i) {

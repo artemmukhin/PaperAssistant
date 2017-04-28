@@ -138,9 +138,9 @@ public class MainActivity extends Activity {
 
 
         Classifier classifier = new Classifier();
-        classifier.addPhotos(files);
-        ArrayList<File> paperFiles = classifier.getPapers();
-
+        //classifier.addPhotos(files);
+        //ArrayList<File> paperFiles = classifier.getPapers();
+        ArrayList<File> paperFiles = files;
 
         Bitmap bmp = decodeSampledBitmapFromFile(files.get(0).getAbsolutePath(), 200, 200);
         Mat imageMat = new Mat();
