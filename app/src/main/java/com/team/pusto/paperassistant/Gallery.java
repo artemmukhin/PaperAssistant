@@ -2,12 +2,14 @@ package com.team.pusto.paperassistant;
 
 import android.Manifest;
 import android.content.Intent;
+import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Environment;
 import android.os.Vibrator;
 import android.support.design.widget.FloatingActionButton;
@@ -60,7 +62,8 @@ public class Gallery extends AppCompatActivity {
         }
 
         gridView = (GridView) findViewById(R.id.gridView);
-        gridAdapter = new GridViewAdapter(this, R.layout.grid_item_layout, getData());
+        //imageItems = new ArrayList<>();
+        gridAdapter = new GridViewAdapter(this, R.layout.grid_item_layout, imageItems);
         gridView.setAdapter(gridAdapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -75,6 +78,7 @@ public class Gallery extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        getData();
         //ImageView imageView = (ImageView) findViewById(R.id.ImageView);
         gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -85,26 +89,85 @@ public class Gallery extends AppCompatActivity {
         });
     }
 
-    private ArrayList<ImageItem> getData() {
-        File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Camera");
-        ArrayList<File> allFiles = new ArrayList<>(Arrays.asList(photosDir.listFiles()));
-        files = new ArrayList<>();
-        for (File file: allFiles) {
-            String name = file.getName();
-            if (file.getName().indexOf(".jpg") > 0 || file.getName().indexOf(".JPG") > 0)
-                files.add(file);
+    Thread thread;
+    final ArrayList<ImageItem> imageItems = new ArrayList<>();
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        if(thread.isAlive()){
+
+            //gridView.invalidate();
         }
 
-        Classifier classifier = new Classifier();
-        classifier.addPhotos(files);
-        ArrayList<File> paperFiles = classifier.getPapers();
+        gridAdapter.notifyDataSetChanged();
+        gridView.invalidateViews();
+    }
 
-        final ArrayList<ImageItem> imageItems = new ArrayList<>();
-        for (int i = 0; i < 28; i++) {
-            Bitmap bmp = decodeSampledBitmapFromFile(files.get(i).getAbsolutePath(), 100, 100);
-            imageItems.add(new ImageItem(bmp, "Image#" + i));
-        }
-        return imageItems;
+    private void getData() {
+
+//        Thread thread = new Thread() {
+//            @Override
+//            public void run() {
+//
+//            }
+//        };
+
+        thread = new Thread(new Runnable() {
+            public void run() {
+                Debug.waitForDebugger();
+                File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Camera");
+
+                ArrayList<File> allFiles = new ArrayList<>(Arrays.asList(photosDir.listFiles()));
+                files = new ArrayList<>();
+                for (File file : allFiles) {
+                    String name = file.getName();
+
+                    files.add(file);
+                }
+
+                Classifier classifier = new Classifier();
+                classifier.addPhotos(files);
+                ArrayList<File> paperFiles = classifier.getPapers();
+
+                if (paperFiles.size() == 0) {
+                    Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
+                    Bitmap bmp = Bitmap.createBitmap(200, 200, conf); // this creates a MUTABLE bitmap;
+                    imageItems.add(new ImageItem(bmp, "Images are not found!"));
+                } else {
+                    for (int i = 0; i < paperFiles.size(); i++) {
+                        Bitmap bmp = decodeSampledBitmapFromFile(files.get(i).getAbsolutePath(), 200, 200);
+                        if (files.get(i).getName().indexOf(".jpg") > 0 || files.get(i).getName().indexOf(".JPG") > 0)
+                            imageItems.add(new ImageItem(bmp, "Image#" + i));
+                        //gridAdapter.notifyDataSetChanged();
+//                        gridView.post(new Runnable() {
+//                            public void run() {
+//                                Debug.waitForDebugger();
+//                                gridView.setAdapter(gridAdapter);
+//                            }
+//                        });
+                    }
+                }
+            }
+        });
+
+        thread.start();
+
+//
+//        ProgressDialog dialog = new ProgressDialog(this); // this = YourActivity
+//        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+//        dialog.setMessage("Loading. Please wait...");
+//        dialog.setIndeterminate(true);
+//        dialog.setCanceledOnTouchOutside(false);
+//        dialog.show();
+//
+//        try {
+//            thread.join();
+//        } catch (InterruptedException e){
+//            //todo: finish exception
+//        }
+//        dialog.hide();
+        //return imageItems
     }
     private ImageItem getItem(int i) {
         Bitmap bmp = decodeSampledBitmapFromFile(files.get(i).getAbsolutePath(), 600, 600);

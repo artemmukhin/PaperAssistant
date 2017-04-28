@@ -2,6 +2,7 @@ package com.team.pusto.paperassistant;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Debug;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +32,7 @@ public class GridViewAdapter extends ArrayAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
         ViewHolder holder = null;
-
+        Debug.waitForDebugger();
         if (row == null) {
             LayoutInflater inflater = ((Activity) context).getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);

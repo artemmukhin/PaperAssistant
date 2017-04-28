@@ -44,7 +44,5 @@
             android:layout_marginRight="5dp"
 
             android:layout_alignParentTop  = "true"/>
-
-    </RelativeLayout>
-
+            </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>

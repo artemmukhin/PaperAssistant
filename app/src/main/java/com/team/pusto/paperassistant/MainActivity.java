@@ -189,6 +189,7 @@ public class MainActivity extends Activity {
         //scanPhotos();
         Intent intent = new Intent(this, Gallery.class);
         startActivity(intent);
+        finish();
         //overridePendingTransition( R.anim.slide_in_left, R.anim.slide_out_left );
     }
 
