@@ -134,8 +134,8 @@ public class Gallery extends AppCompatActivity {
                 files = new ArrayList<>();
                 for (File file : allFiles) {
                     String name = file.getName();
-
-                    files.add(file);
+                    if (file.getName().indexOf(".jpg") > 0 || file.getName().indexOf(".JPG") > 0)
+                        files.add(file);
                 }
 
                 Classifier classifier = new Classifier();
