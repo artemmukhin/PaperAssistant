@@ -1,47 +1,28 @@
 package com.team.pusto.paperassistant;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.team.pusto.paperassistant.classifierengine.Classifier;
 
 import org.opencv.android.Utils;
-import org.opencv.core.Core;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
-import org.opencv.core.MatOfFloat;
-import org.opencv.core.MatOfInt;
-import org.opencv.core.Scalar;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.core.Point;
-import org.opencv.core.Size;
 
 import org.opencv.android.OpenCVLoader;
 
@@ -151,7 +132,7 @@ public class MainActivity extends Activity {
         return BitmapFactory.decodeFile(path, options);
     }
 
-    public void doScience() {
+    public void scanPhotos() {
         File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Camera");
         ArrayList<File> files = new ArrayList<File>(Arrays.asList(photosDir.listFiles()));
 
@@ -205,11 +186,12 @@ public class MainActivity extends Activity {
     }
 
     public void buttonOnClick(View view) {
-        doScience();
+        //scanPhotos();
+        Intent intent = new Intent(this, Gallery.class);
+        startActivity(intent);
+        //overridePendingTransition( R.anim.slide_in_left, R.anim.slide_out_left );
     }
 
     public void imageView1OnClick(View view) {
-        Intent intent = new Intent(MainActivity.this, Preview.class);
-        startActivity(intent);
     }
 }
