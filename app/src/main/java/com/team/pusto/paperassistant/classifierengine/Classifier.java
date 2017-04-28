@@ -34,7 +34,8 @@ public class Classifier {
         for (Photo photo: photos) {
             Mat image = photo.getImageMat();
             HSVHistogram histogram = new HSVHistogram(image);
-            papers.add(photo.getFile());
+            if (isHistogramPaper(histogram))
+                papers.add(photo.getFile());
         }
         return papers;
     }
@@ -92,7 +93,7 @@ public class Classifier {
                 break;
         }
 
-        result = (isPaperCount > 5);
+        result = (isPaperCount > isNotPaperCount);
         return result;
     }
 }

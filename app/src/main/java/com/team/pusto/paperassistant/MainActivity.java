@@ -152,7 +152,6 @@ public class MainActivity extends Activity {
     }
 
     public void doScience() {
-
         File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM");
         ArrayList<File> filesAll = new ArrayList<File>(Arrays.asList(photosDir.listFiles()));
         //List<File> files = filesAll.subList(0, 5);
@@ -217,11 +216,11 @@ public class MainActivity extends Activity {
             e.printStackTrace();
         }
 */
-
+/*
         Bitmap bmp = decodeSampledBitmapFromFile(files.get(0).getAbsolutePath(), 200, 200);
         Mat imageMat = new Mat();
         Utils.bitmapToMat(bmp, imageMat);
-
+*/
         /*
         InputStream stream = null;
         Uri path = Uri.parse("android.resource://com.team.pusto.paperassistant/" + R.drawable.not32);
@@ -249,6 +248,7 @@ public class MainActivity extends Activity {
         */
 
         // do smth with mat
+        /*
         Mat newMat = new Mat();
         Imgproc.cvtColor(imageMat, newMat, Imgproc.COLOR_RGB2GRAY);
 
@@ -259,6 +259,7 @@ public class MainActivity extends Activity {
         // find the imageview and draw it!
         ImageView iv = (ImageView) findViewById(R.id.imageView1);
         iv.setImageBitmap(bm);
+        */
     }
 
     public void buttonOnClick(View view) {
