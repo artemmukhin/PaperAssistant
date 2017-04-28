@@ -28,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.team.pusto.paperassistant.classifierengine.Classifier;
+import com.team.pusto.paperassistant.classifierengine.Indexer;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
@@ -151,14 +152,17 @@ public class MainActivity extends Activity {
     }
 
     public void doScience() {
-        File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Camera");
+        File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Papers");
         ArrayList<File> filesAll = new ArrayList<File>(Arrays.asList(photosDir.listFiles()));
         List<File> files = filesAll.subList(0, 5);
 
-        Classifier classifier = new Classifier();
-        classifier.addPhotos(files);
-        List<File> paperFiles = classifier.getPapers();
+        //Classifier classifier = new Classifier();
+        //classifier.addPhotos(files);
+        //List<File> paperFiles = classifier.getPapers();
 
+        Indexer indexer = new Indexer(true);
+        indexer.addPhotos(files);
+        indexer.index();
 
         Bitmap bmp = decodeSampledBitmapFromFile(files.get(0).getAbsolutePath(), 200, 200);
         Mat imageMat = new Mat();
