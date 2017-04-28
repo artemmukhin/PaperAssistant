@@ -152,12 +152,12 @@ public class MainActivity extends Activity {
 
     public void doScience() {
         File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Camera");
-        ArrayList<File> files = new ArrayList<File>(Arrays.asList(photosDir.listFiles()));
-
+        ArrayList<File> filesAll = new ArrayList<File>(Arrays.asList(photosDir.listFiles()));
+        List<File> files = filesAll.subList(0, 5);
 
         Classifier classifier = new Classifier();
         classifier.addPhotos(files);
-        ArrayList<File> paperFiles = classifier.getPapers();
+        List<File> paperFiles = classifier.getPapers();
 
 
         Bitmap bmp = decodeSampledBitmapFromFile(files.get(0).getAbsolutePath(), 200, 200);
