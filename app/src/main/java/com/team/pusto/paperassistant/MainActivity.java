@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -205,5 +206,10 @@ public class MainActivity extends Activity {
 
     public void buttonOnClick(View view) {
         doScience();
+    }
+
+    public void imageView1OnClick(View view) {
+        Intent intent = new Intent(MainActivity.this, Preview.class);
+        startActivity(intent);
     }
 }
