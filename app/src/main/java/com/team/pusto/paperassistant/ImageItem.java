@@ -31,4 +31,8 @@ public class ImageItem {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    public void setImageBitmap(Bitmap imageBitmap) {
+        this.image = imageBitmap;
+    }
 }

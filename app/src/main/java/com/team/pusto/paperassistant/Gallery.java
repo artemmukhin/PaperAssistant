@@ -1,10 +1,12 @@
 package com.team.pusto.paperassistant;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
@@ -14,6 +16,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.team.pusto.paperassistant.classifierengine.Classifier;
@@ -29,7 +32,7 @@ public class Gallery extends AppCompatActivity {
     public GridView gridView;
     public GridViewAdapter gridAdapter;
     static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 324;
-
+    public  ArrayList<File> files;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,21 +57,39 @@ public class Gallery extends AppCompatActivity {
         gridView = (GridView) findViewById(R.id.gridView);
         gridAdapter = new GridViewAdapter(this, R.layout.grid_item_layout, getData());
         gridView.setAdapter(gridAdapter);
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                ImageItem item = getItem(position);
+                //Create intent
+                Intent intent = new Intent(Gallery.this, Preview.class);
+                intent.putExtra("title", item.getTitle());
+                intent.putExtra("image", item.getImage());
+
+                //Start details activity
+                startActivity(intent);
+            }
+        });
     }
 
     private ArrayList<ImageItem> getData() {
         File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Camera");
-        ArrayList<File> files = new ArrayList<File>(Arrays.asList(photosDir.listFiles()));
+        files = new ArrayList<>(Arrays.asList(photosDir.listFiles()));
 
         Classifier classifier = new Classifier();
         classifier.addPhotos(files);
         ArrayList<File> paperFiles = classifier.getPapers();
 
         final ArrayList<ImageItem> imageItems = new ArrayList<>();
-        for (int i = 0; i < paperFiles.size(); i++) {
-            Bitmap bmp = decodeSampledBitmapFromFile(files.get(i).getAbsolutePath(), 200, 200);
+        for (int i = 0; i < 20; i++) {
+            Bitmap bmp = decodeSampledBitmapFromFile(files.get(i).getAbsolutePath(), 80, 80);
             imageItems.add(new ImageItem(bmp, "Image#" + i));
         }
         return imageItems;
+    }
+    private ImageItem getItem(int i) {
+        Bitmap bmp = decodeSampledBitmapFromFile(files.get(i).getAbsolutePath(), 600, 600);
+        ImageItem im = new ImageItem(bmp, "Image#" + i);
+        return im;
     }
 }

@@ -49,6 +49,8 @@ public class GridViewAdapter extends ArrayAdapter {
         return row;
     }
 
+    
+
     static class ViewHolder {
         TextView imageTitle;
         ImageView image;
