@@ -9,15 +9,19 @@ import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Vibrator;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.team.pusto.paperassistant.classifierengine.Classifier;
 
@@ -33,6 +37,7 @@ public class Gallery extends AppCompatActivity {
     public GridViewAdapter gridAdapter;
     static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 324;
     public  ArrayList<File> files;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,19 +75,33 @@ public class Gallery extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        //ImageView imageView = (ImageView) findViewById(R.id.ImageView);
+        gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                return true;
+            }
+        });
     }
 
     private ArrayList<ImageItem> getData() {
         File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Camera");
-        files = new ArrayList<>(Arrays.asList(photosDir.listFiles()));
+        ArrayList<File> allFiles = new ArrayList<>(Arrays.asList(photosDir.listFiles()));
+        files = new ArrayList<>();
+        for (File file: allFiles) {
+            String name = file.getName();
+            if (file.getName().indexOf(".jpg") > 0 || file.getName().indexOf(".JPG") > 0)
+                files.add(file);
+        }
 
         Classifier classifier = new Classifier();
         classifier.addPhotos(files);
         ArrayList<File> paperFiles = classifier.getPapers();
 
         final ArrayList<ImageItem> imageItems = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-            Bitmap bmp = decodeSampledBitmapFromFile(files.get(i).getAbsolutePath(), 80, 80);
+        for (int i = 0; i < 28; i++) {
+            Bitmap bmp = decodeSampledBitmapFromFile(files.get(i).getAbsolutePath(), 100, 100);
             imageItems.add(new ImageItem(bmp, "Image#" + i));
         }
         return imageItems;
@@ -90,6 +109,11 @@ public class Gallery extends AppCompatActivity {
     private ImageItem getItem(int i) {
         Bitmap bmp = decodeSampledBitmapFromFile(files.get(i).getAbsolutePath(), 600, 600);
         ImageItem im = new ImageItem(bmp, "Image#" + i);
+        Toast.makeText(this, getFileName(i), Toast.LENGTH_LONG).show();
         return im;
+    }
+    private String getFileName(int i) {
+        File file = files.get(i);
+        return file.getName();
     }
 }

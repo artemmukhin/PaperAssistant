@@ -42,7 +42,7 @@
             android:clickable="true"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
-            android:layout_alignParentBottom="true"
+
             android:layout_alignParentTop  = "true"/>
 
     </RelativeLayout>

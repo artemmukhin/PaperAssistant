@@ -36,7 +36,7 @@ public class GridViewAdapter extends ArrayAdapter {
             LayoutInflater inflater = ((Activity) context).getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);
             holder = new ViewHolder();
-            holder.imageTitle = (TextView) row.findViewById(R.id.text);
+            //holder.imageTitle = (TextView) row.findViewById(R.id.text);
             holder.image = (ImageView) row.findViewById(R.id.image);
             row.setTag(holder);
         } else {
@@ -44,7 +44,7 @@ public class GridViewAdapter extends ArrayAdapter {
         }
 
         ImageItem item = (ImageItem)data.get(position);
-        holder.imageTitle.setText(item.getTitle());
+        //holder.imageTitle.setText(item.getTitle());
         holder.image.setImageBitmap(item.getImage());
         return row;
     }
@@ -52,7 +52,7 @@ public class GridViewAdapter extends ArrayAdapter {
     
 
     static class ViewHolder {
-        TextView imageTitle;
+        //TextView imageTitle;
         ImageView image;
     }
 }
