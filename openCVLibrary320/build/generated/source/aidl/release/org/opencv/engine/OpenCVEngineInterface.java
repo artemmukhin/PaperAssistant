@@ -1,6 +1,6 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: /Users/ortem/prog/AndroidStudioProjects/PaperAssistant/openCVLibrary320/src/main/aidl/org/opencv/engine/OpenCVEngineInterface.aidl
+ * Original file: E:\\Prog\\HackatonPMPU\\Paper-Assistant2\\PaperAssistant\\openCVLibrary320\\src\\main\\aidl\\org\\opencv\\engine\\OpenCVEngineInterface.aidl
  */
 package org.opencv.engine;
 /**
