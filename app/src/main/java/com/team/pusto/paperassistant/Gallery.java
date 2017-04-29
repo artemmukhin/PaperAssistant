@@ -29,6 +29,7 @@ import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -49,7 +50,7 @@ public class Gallery extends AppCompatActivity {
     public GridView gridView;
     public GridViewAdapter gridAdapter;
     static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 324;
-    public  ArrayList<File> files;
+    public ArrayList<File> paperFiles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,108 +82,7 @@ public class Gallery extends AppCompatActivity {
 
         gridView.setAdapter(gridAdapter);
         gridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
-        gridView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
-
-            @Override
-            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                // TODO Auto-generated method stub
-                return false;
-            }
-
-            @Override
-            public void onDestroyActionMode(ActionMode mode) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                // TODO Auto-generated method stub
-
-                mode.setTitle("One item selected");
-                SubMenu subMenu = menu.addSubMenu("Menu");
-                subMenu.add("Rotate");
-                subMenu.add("Extract");
-                subMenu.add("Exclude");
-                return true;
-
-            }
-
-            @Override
-            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                // TODO Auto-generated method stub
-
-                mode.setTitle(item.getTitle());
-                if (item.getTitle().equals("Rotate")){
-                    rotatePhotos(mode);
-                }
-                if (item.getTitle().equals("Extract")){
-                    extractPhotos(mode);
-                }
-                if (item.getTitle().equals("Exclude")){
-                    excludePhotos(mode);
-                }
-
-                return true;
-            }
-
-            private void rotatePhotos(ActionMode mode) {
-
-                //todo: in rotatePhotos() change files and not bitmap
-                SparseBooleanArray booleanArray = gridView.getCheckedItemPositions();
-
-                Matrix matrix = new Matrix();
-                matrix.postRotate(90);
-
-                for (int i = 0; i < /*imageItems.size()*/booleanArray.size(); i++) {
-                    if (booleanArray.get(i)) {
-                        ImageItem ii = imageItems.get(i);
-                        Bitmap rotatedsrc = Bitmap.createBitmap(ii.getImage()
-                                , 0, 0
-                                , ii.getImage().getWidth()
-                                , ii.getImage().getHeight()
-                                , matrix, true);
-                        imageItems.get(i).setImage(rotatedsrc);
-                    }
-                }
-                gridAdapter.notifyDataSetChanged();
-            }
-
-            private void extractPhotos(ActionMode mode){
-                mode.setTitle("Extracting...");
-                //Toast.makeText(this, "Extracting...", Toast.LENGTH_LONG).show();
-            }
-
-            private void excludePhotos(ActionMode mode){
-                mode.setTitle("Excluding...");
-                SparseBooleanArray booleanArray = gridView.getCheckedItemPositions();
-                int i = booleanArray.size() - 1;
-                while (i >= 0){
-                    if (booleanArray.get(i)){
-                        imageItems.remove(i);
-                    }
-                    else
-                        i--;
-                }
-                gridAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onItemCheckedStateChanged(ActionMode mode, int position,
-                                                  long id, boolean checked) {
-                // TODO Auto-generated method stub
-                int selectCount = gridView.getCheckedItemCount();
-                switch (selectCount) {
-                    case 1:
-                        mode.setTitle("One item selected");
-                        break;
-                    default:
-                        mode.setTitle("" + selectCount + " items selected");
-                        break;
-                }
-
-            }
-        });
+        gridView.setMultiChoiceModeListener(new MyMultiChoiceModeListener());
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -195,7 +95,11 @@ public class Gallery extends AppCompatActivity {
 
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), (int)id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                 //Start details activity
-                startActivity(intent);
+                try {
+                    startActivity(intent);
+                } catch (Exception e){
+                    int i = 1234;
+                }
             }
         });
         getData();
@@ -244,16 +148,15 @@ public class Gallery extends AppCompatActivity {
                 File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Camera");
 
                 ArrayList<File> allFiles = new ArrayList<>(Arrays.asList(photosDir.listFiles()));
-                files = new ArrayList<>();
+                ArrayList<File> files = new ArrayList<>();
                 for (File file : allFiles) {
                     String name = file.getName();
-
                     files.add(file);
                 }
 
                 Classifier classifier = new Classifier();
                 classifier.addPhotos(files);
-                ArrayList<File> paperFiles = classifier.getPapers();
+                paperFiles = classifier.getPapers();
 
                 if (paperFiles.size() == 0) {
                     Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
@@ -261,7 +164,7 @@ public class Gallery extends AppCompatActivity {
                     imageItems.add(new ImageItem(bmp, "Images are not found!"));
                 } else {
                     //paperFiles.size()
-                    for (int i = 0; i < 20; i++) {
+                    for (int i = 0; i < paperFiles.size(); i++) {
                         Bitmap bmp = decodeSampledBitmapFromFile(files.get(i).getAbsolutePath(), 200, 200);
                         if (files.get(i).getName().indexOf(".jpg") > 0 || files.get(i).getName().indexOf(".JPG") > 0)
                             imageItems.add(new ImageItem(bmp, "Image#" + i));
@@ -280,14 +183,118 @@ public class Gallery extends AppCompatActivity {
         thread.start();
     }
     private ImageItem getItem(int i) {
-        Bitmap bmp = decodeSampledBitmapFromFile(files.get(i).getAbsolutePath(), 600, 600);
+        Bitmap bmp = decodeSampledBitmapFromFile(paperFiles.get(i).getAbsolutePath(), 600, 600);
         ImageItem im = new ImageItem(bmp, "Image#" + i);
         Toast.makeText(this, getFileName(i), Toast.LENGTH_SHORT).show();
         return im;
     }
     private String getFileName(int i) {
-        File file = files.get(i);
+        File file = paperFiles.get(i);
         return file.getName();
     }
 
+
+    private class MyMultiChoiceModeListener implements MultiChoiceModeListener {
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            // TODO Auto-generated method stub
+
+            mode.setTitle("One item selected");
+            SubMenu subMenu = menu.addSubMenu("Menu");
+            subMenu.add("Rotate");
+            subMenu.add("Extract");
+            subMenu.add("Exclude");
+            return true;
+
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            // TODO Auto-generated method stub
+
+            mode.setTitle(item.getTitle());
+            if (item.getTitle().equals("Rotate")){
+                rotatePhotos(mode);
+            }
+            if (item.getTitle().equals("Extract")){
+                extractPhotos(mode);
+            }
+            if (item.getTitle().equals("Exclude")){
+                excludePhotos(mode);
+            }
+
+            return true;
+        }
+
+        private void rotatePhotos(ActionMode mode) {
+
+            //todo: in rotatePhotos() change files and not bitmap
+            SparseBooleanArray booleanArray = gridView.getCheckedItemPositions();
+
+            Matrix matrix = new Matrix();
+            matrix.postRotate(90);
+
+            for (int i = 0; i < imageItems.size(); i++) {
+                if (booleanArray.get(i)) {
+                    ImageItem ii = imageItems.get(i);
+                    Bitmap rotatedsrc = Bitmap.createBitmap(ii.getImage()
+                            , 0, 0
+                            , ii.getImage().getWidth()
+                            , ii.getImage().getHeight()
+                            , matrix, true);
+                    imageItems.get(i).setImage(rotatedsrc);
+                }
+            }
+            gridAdapter.notifyDataSetChanged();
+        }
+
+        private void extractPhotos(ActionMode mode){
+            mode.setTitle("Extracting...");
+        }
+
+        private void excludePhotos(ActionMode mode){
+            mode.setTitle("Excluding...");
+            SparseBooleanArray booleanArray = gridView.getCheckedItemPositions();
+            int i = imageItems.size() - 1;
+            while (i >= 0){
+                if (booleanArray.get(i)){
+                    imageItems.remove(i);
+                    paperFiles.remove(i);
+                }
+                i--;
+            }
+            gridView.clearChoices();
+            gridAdapter.notifyDataSetChanged();
+            mode.finish();
+        }
+
+        @Override
+        public void onItemCheckedStateChanged(ActionMode mode, int position,
+                                              long id, boolean checked) {
+            // TODO Auto-generated method stub
+            int selectCount = gridView.getCheckedItemCount();
+            switch (selectCount) {
+                case 1:
+                    mode.setTitle("One item selected");
+                    break;
+                default:
+                    mode.setTitle("" + selectCount + " items selected");
+                    break;
+            }
+
+        }
+    }
 }
