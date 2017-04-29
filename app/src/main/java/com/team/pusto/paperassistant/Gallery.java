@@ -27,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.team.pusto.paperassistant.classifierengine.Classifier;
+import com.team.pusto.paperassistant.classifierengine.ListAdapter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -77,16 +78,10 @@ public class Gallery extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), Preview.class);
                 intent.putExtra("title", item.getTitle());
                 intent.putExtra("image", item.getImage());
-                //intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), (int)id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                Toast.makeText(Gallery.this, "beforeStartingActivity", Toast.LENGTH_LONG).show();
                 //Start details activity
-                try {
-                    startActivity(intent);
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
+                startActivity(intent);
             }
         });
         getData();
@@ -107,9 +102,12 @@ public class Gallery extends AppCompatActivity {
     @Override
     protected void onResume(){
         super.onResume();
-        if(thread.isAlive()){
-
-            //gridView.invalidate();
+        if (thread.isAlive()) {
+            try {
+                //Toast.makeText(this, "Files are scanning...", Toast.LENGTH_LONG).show();
+                thread.join();
+            } catch (InterruptedException e) {
+            }
         }
 
         gridAdapter.notifyDataSetChanged();
@@ -134,8 +132,8 @@ public class Gallery extends AppCompatActivity {
                 files = new ArrayList<>();
                 for (File file : allFiles) {
                     String name = file.getName();
-                    if (file.getName().indexOf(".jpg") > 0 || file.getName().indexOf(".JPG") > 0)
-                        files.add(file);
+
+                    files.add(file);
                 }
 
                 Classifier classifier = new Classifier();
@@ -164,30 +162,7 @@ public class Gallery extends AppCompatActivity {
             }
         });
 
-
         thread.start();
-        try {
-            thread.join();
-        } catch (InterruptedException e){
-
-        }
-
-
-//
-//        ProgressDialog dialog = new ProgressDialog(this); // this = YourActivity
-//        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-//        dialog.setMessage("Loading. Please wait...");
-//        dialog.setIndeterminate(true);
-//        dialog.setCanceledOnTouchOutside(false);
-//        dialog.show();
-//
-//        try {
-//            thread.join();
-//        } catch (InterruptedException e){
-//            //todo: finish exception
-//        }
-//        dialog.hide();
-        //return imageItems
     }
     private ImageItem getItem(int i) {
         Bitmap bmp = decodeSampledBitmapFromFile(files.get(i).getAbsolutePath(), 600, 600);

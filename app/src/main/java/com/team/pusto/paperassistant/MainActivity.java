@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.team.pusto.paperassistant.classifierengine.Classifier;
 
@@ -187,9 +189,10 @@ public class MainActivity extends Activity {
 
     public void buttonOnClick(View view) {
         //scanPhotos();
+        Toast.makeText(this, "Scanning photos...", Toast.LENGTH_LONG).show();
         Intent intent = new Intent(this, Gallery.class);
+
         startActivity(intent);
-        finish();
         //overridePendingTransition( R.anim.slide_in_left, R.anim.slide_out_left );
     }
 

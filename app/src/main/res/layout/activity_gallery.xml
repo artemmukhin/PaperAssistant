@@ -6,43 +6,59 @@
     android:layout_height="match_parent"
     tools:context="com.team.pusto.paperassistant.Gallery">
 
-    <android.support.design.widget.AppBarLayout
+    <include
+        android:id="@+id/include"
+        layout="@layout/content_gallery"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_height="260dp"
+        android:layout_weight="1" />
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-    </android.support.design.widget.AppBarLayout>
-
-    <include layout="@layout/content_gallery"
-        android:id="@+id/include" />
-
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#f0f0f0">
+        android:orientation="vertical">
 
-        <GridView
-            android:id="@+id/gridView"
-            android:layout_width="fill_parent"
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:columnWidth="100dp"
-            android:drawSelectorOnTop="true"
-            android:gravity="center"
-            android:numColumns="auto_fit"
-            android:stretchMode="columnWidth"
-            android:verticalSpacing="5dp"
-            android:focusable="true"
-            android:clickable="true"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
+            android:theme="@style/AppTheme.AppBarOverlay">
 
-            android:layout_alignParentTop  = "true"/>
-            </RelativeLayout>
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/colorPrimary"
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
+        </android.support.design.widget.AppBarLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#f0f0f0">
+
+            <GridView
+                android:id="@+id/gridView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:columnWidth="100dp"
+                android:drawSelectorOnTop="true"
+                android:focusable="true"
+
+                android:gravity="center"
+                android:numColumns="auto_fit"
+                android:stretchMode="columnWidth"
+                android:verticalSpacing="5dp" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+        </LinearLayout>
+
+    </LinearLayout>
+
 </android.support.design.widget.CoordinatorLayout>
