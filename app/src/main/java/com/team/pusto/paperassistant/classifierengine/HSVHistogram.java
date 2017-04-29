@@ -10,6 +10,7 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.List;
 
+// actually RGB histogram
 public class HSVHistogram implements java.io.Serializable {
     final static double EPS = 1e-8;
 

@@ -2,10 +2,6 @@ package com.team.pusto.paperassistant.classifierengine;
 
 import android.content.Context;
 import android.content.res.AssetManager;
-import android.net.Uri;
-
-import com.team.pusto.paperassistant.MainActivity;
-import com.team.pusto.paperassistant.R;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -15,7 +11,6 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
