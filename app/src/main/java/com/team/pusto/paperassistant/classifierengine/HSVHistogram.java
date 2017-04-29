@@ -61,20 +61,14 @@ public class HSVHistogram implements java.io.Serializable {
         firstHist.get(0, 0, histFloat1);
 
         float[] histFloat2 = new float[secondHist.cols() * secondHist.rows() * (int) secondHist.elemSize()];
-        firstHist.get(0, 0, histFloat2);
+        secondHist.get(0, 0, histFloat2);
 
         float[] histFloat3 = new float[thirdHist.cols() * thirdHist.rows() * (int) thirdHist.elemSize()];
-        firstHist.get(0, 0, histFloat3);
+        thirdHist.get(0, 0, histFloat3);
 
         this.firstHist = histFloat1;
         this.secondHist = histFloat2;
         this.thirdHist = histFloat3;
-    }
-
-    public HSVHistogram(float[] firstHist, float[] secondHist, float[] thirdHist) {
-        this.firstHist = firstHist;
-        this.secondHist = secondHist;
-        this.thirdHist = thirdHist;
     }
 
     public static double distanceBetweenHistograms(HSVHistogram h1, HSVHistogram h2) {
