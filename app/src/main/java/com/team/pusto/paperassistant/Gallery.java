@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.media.Image;
 import android.os.Bundle;
 import android.os.Debug;
@@ -19,11 +20,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -97,7 +100,10 @@ public class Gallery extends AppCompatActivity {
                 // TODO Auto-generated method stub
 
                 mode.setTitle("One item selected");
-                menu.add(1,1,1,"Rotate");
+                SubMenu subMenu = menu.addSubMenu("Menu");
+                subMenu.add("Rotate");
+                subMenu.add("Extract");
+                subMenu.add("Exclude");
                 return true;
 
             }
@@ -106,27 +112,65 @@ public class Gallery extends AppCompatActivity {
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                 // TODO Auto-generated method stub
 
-
-                int selectCount = gridView.getCheckedItemCount();
-                switch (selectCount) {
-                    case 1:
-                        mode.setTitle("One item selected");
-                        break;
-                    default:
-                        mode.setTitle("" + selectCount + " items selected");
-                        break;
+                mode.setTitle(item.getTitle());
+                if (item.getTitle().equals("Rotate")){
+                    rotatePhotos(mode);
+                }
+                if (item.getTitle().equals("Extract")){
+                    extractPhotos(mode);
+                }
+                if (item.getTitle().equals("Exclude")){
+                    excludePhotos(mode);
                 }
 
                 return true;
+            }
+
+            private void rotatePhotos(ActionMode mode) {
+
+                //todo: in rotatePhotos() change files and not bitmap
+                SparseBooleanArray booleanArray = gridView.getCheckedItemPositions();
+
+                Matrix matrix = new Matrix();
+                matrix.postRotate(90);
+
+                for (int i = 0; i < /*imageItems.size()*/booleanArray.size(); i++) {
+                    if (booleanArray.get(i)) {
+                        ImageItem ii = imageItems.get(i);
+                        Bitmap rotatedsrc = Bitmap.createBitmap(ii.getImage()
+                                , 0, 0
+                                , ii.getImage().getWidth()
+                                , ii.getImage().getHeight()
+                                , matrix, true);
+                        imageItems.get(i).setImage(rotatedsrc);
+                    }
+                }
+                gridAdapter.notifyDataSetChanged();
+            }
+
+            private void extractPhotos(ActionMode mode){
+                mode.setTitle("Extracting...");
+                //Toast.makeText(this, "Extracting...", Toast.LENGTH_LONG).show();
+            }
+
+            private void excludePhotos(ActionMode mode){
+                mode.setTitle("Excluding...");
+                SparseBooleanArray booleanArray = gridView.getCheckedItemPositions();
+                int i = booleanArray.size() - 1;
+                while (i >= 0){
+                    if (booleanArray.get(i)){
+                        imageItems.remove(i);
+                    }
+                    else
+                        i--;
+                }
+                gridAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onItemCheckedStateChanged(ActionMode mode, int position,
                                                   long id, boolean checked) {
                 // TODO Auto-generated method stub
-
-
-
                 int selectCount = gridView.getCheckedItemCount();
                 switch (selectCount) {
                     case 1:
