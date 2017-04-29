@@ -12,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -25,18 +26,51 @@ import android.widget.Toast;
 
 import com.team.pusto.paperassistant.classifierengine.Classifier;
 
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static com.team.pusto.paperassistant.MainActivity.decodeSampledBitmapFromFile;
+
+import static android.content.ContentValues.TAG;
 
 public class Gallery extends AppCompatActivity {
 
     public GridView gridView;
     public GridViewAdapter gridAdapter;
     static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 324;
-    public ArrayList<File> paperFiles;
+    public List<File> paperFiles;
+
+    static {
+        if (OpenCVLoader.initDebug()) {
+            Log.i(TAG, "OpenCV initialize success");
+        } else {
+            Log.i(TAG, "OpenCV initialize failed");
+        }
+    }
+
+    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
+        @Override
+        public void onManagerConnected(int status) {
+            switch (status) {
+                case LoaderCallbackInterface.SUCCESS:
+                {
+                    Log.i("OpenCV", "OpenCV loaded successfully");
+                } break;
+                default:
+                {
+                    super.onManagerConnected(status);
+                } break;
+            }
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +130,16 @@ public class Gallery extends AppCompatActivity {
     @Override
     protected void onResume(){
         super.onResume();
+
+        if (!OpenCVLoader.initDebug()) {
+            Log.d("OpenCV", "Internal OpenCV library not found. Using OpenCV Manager for initialization");
+            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, mLoaderCallback);
+        } else {
+            Log.d("OpenCV", "OpenCV library found inside package. Using it!");
+            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+        }
+
+
         if (thread.isAlive()) {
             try {
                 thread.join();
@@ -119,16 +163,26 @@ public class Gallery extends AppCompatActivity {
         thread = new Thread(new Runnable() {
             public void run() {
                 //Debug.waitForDebugger();
-                File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Camera");
+                File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/papers3");
 
                 ArrayList<File> allFiles = new ArrayList<>(Arrays.asList(photosDir.listFiles()));
                 ArrayList<File> files = new ArrayList<>();
                 for (File file : allFiles) {
                     String name = file.getName();
-                    files.add(file);
+                    if (name.indexOf(".jpg") > 0 || name.indexOf(".JPG") > 0)
+                        files.add(file);
                 }
 
                 Classifier classifier = new Classifier();
+                try {
+                    classifier.loadIndexStore(MainActivity.getAppContext(), true);
+                    classifier.loadIndexStore(MainActivity.getAppContext(), false);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+
                 classifier.addPhotos(files);
                 paperFiles = classifier.getPapers();
 

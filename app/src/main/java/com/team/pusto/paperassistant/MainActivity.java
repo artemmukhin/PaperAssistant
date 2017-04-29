@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -33,6 +34,12 @@ import static android.content.ContentValues.TAG;
 
 public class MainActivity extends Activity {
     final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
+
+    private static Context context;
+
+    public static Context getAppContext() {
+        return MainActivity.context;
+    }
 
     static {
         if (OpenCVLoader.initDebug()) {
@@ -70,6 +77,8 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        MainActivity.context = getApplicationContext();
 
 // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -132,59 +141,6 @@ public class MainActivity extends Activity {
         options.inJustDecodeBounds = false;
 
         return BitmapFactory.decodeFile(path, options);
-    }
-
-    public void scanPhotos() {
-        File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Camera");
-        ArrayList<File> files = new ArrayList<File>(Arrays.asList(photosDir.listFiles()));
-
-
-        Classifier classifier = new Classifier();
-        //classifier.addPhotos(files);
-        //ArrayList<File> paperFiles = classifier.getPapers();
-        ArrayList<File> paperFiles = files;
-
-        Bitmap bmp = decodeSampledBitmapFromFile(files.get(0).getAbsolutePath(), 200, 200);
-        Mat imageMat = new Mat();
-        Utils.bitmapToMat(bmp, imageMat);
-
-        /*
-        InputStream stream = null;
-        Uri path = Uri.parse("android.resource://com.team.pusto.paperassistant/" + R.drawable.not32);
-        try {
-            stream = getContentResolver().openInputStream(path);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
-        bmpFactoryOptions.inPreferredConfig = Bitmap.Config.ARGB_8888;
-
-        Bitmap bmp = BitmapFactory.decodeStream(stream, null, bmpFactoryOptions);
-
-
-        Mat imageMat = new Mat();
-        Utils.bitmapToMat(bmp, imageMat);
-
-        // calculate histogram
-        Mat hist = new Mat();
-        ArrayList<Mat> imageList = new ArrayList<Mat>();
-        imageList.add(imageMat);
-        Imgproc.calcHist(imageList, new MatOfInt(0, 1, 2), null, hist, new MatOfInt(8, 8, 8),
-                new MatOfFloat(0, 256, 0, 256, 0, 256));
-        */
-
-        // do smth with mat
-        Mat newMat = new Mat();
-        Imgproc.cvtColor(imageMat, newMat, Imgproc.COLOR_RGB2GRAY);
-
-        // convert to bitmap:
-        Bitmap bm = Bitmap.createBitmap(newMat.cols(), newMat.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(newMat, bm);
-
-        // find the imageview and draw it!
-        ImageView iv = (ImageView) findViewById(R.id.imageView1);
-        iv.setImageBitmap(bm);
     }
 
     public void buttonOnClick(View view) {

@@ -27,8 +27,6 @@ public class Classifier {
 
     public void addPhotos(List<File> photoFiles) {
         photos = new ArrayList<>();
-        indexedPapers = null;
-        indexedNotPapers = null;
         for (File file: photoFiles) {
             photos.add(new Photo(file));
         }
