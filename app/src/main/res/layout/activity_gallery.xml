@@ -48,17 +48,7 @@
             android:layout_marginRight="5dp"
             android:layout_alignParentTop  = "true"/>
 
-            <Button
-                android:id="@+id/button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/gridView"
-                android:layout_alignStart="@+id/gridView"
-                android:onClick="buttonExlcudeOnClick"
-                android:text="Exclude"
-                android:layout_alignParentBottom="true" />
         </RelativeLayout>
-
     </LinearLayout>
 
     <include layout="@layout/content_gallery"

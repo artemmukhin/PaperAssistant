@@ -3,19 +3,11 @@ package com.team.pusto.paperassistant;
 import android.Manifest;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.media.Image;
 import android.os.Bundle;
-import android.os.Debug;
 import android.os.Environment;
-import android.os.Vibrator;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -23,21 +15,15 @@ import android.support.v7.widget.Toolbar;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.team.pusto.paperassistant.classifierengine.Classifier;
-//import com.team.pusto.paperassistant.classifierengine.ListAdapter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -91,9 +77,8 @@ public class Gallery extends AppCompatActivity {
                 //Create intent
                 Intent intent = new Intent(getApplicationContext(), Preview.class);
                 intent.putExtra("title", item.getTitle());
-                intent.putExtra("image", item.getImage());
 
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), (int)id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                //PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), (int)id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                 //Start details activity
                 try {
                     startActivity(intent);
@@ -103,16 +88,6 @@ public class Gallery extends AppCompatActivity {
             }
         });
         getData();
-        //ImageView imageView = (ImageView) findViewById(R.id.ImageView);
-/*
-        gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(Gallery.this, "Yay", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        });
-        */
     }
 
     Thread thread;
@@ -123,7 +98,6 @@ public class Gallery extends AppCompatActivity {
         super.onResume();
         if (thread.isAlive()) {
             try {
-                //Toast.makeText(this, "Files are scanning...", Toast.LENGTH_LONG).show();
                 thread.join();
             } catch (InterruptedException e) {
             }
@@ -184,7 +158,7 @@ public class Gallery extends AppCompatActivity {
     }
     private ImageItem getItem(int i) {
         Bitmap bmp = decodeSampledBitmapFromFile(paperFiles.get(i).getAbsolutePath(), 600, 600);
-        ImageItem im = new ImageItem(bmp, "Image#" + i);
+        ImageItem im = new ImageItem(bmp, paperFiles.get(i).getAbsolutePath());
         Toast.makeText(this, getFileName(i), Toast.LENGTH_SHORT).show();
         return im;
     }
@@ -192,6 +166,7 @@ public class Gallery extends AppCompatActivity {
         File file = paperFiles.get(i);
         return file.getName();
     }
+
 
 
     private class MyMultiChoiceModeListener implements MultiChoiceModeListener {

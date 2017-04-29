@@ -116,14 +116,14 @@ public class MainActivity extends Activity {
         int inSampleSize = 1;
 
         if (height > reqHeight) {
-            inSampleSize = Math.round((float)height / (float)reqHeight);
+            inSampleSize = Math.round((float) height / (float) reqHeight);
         }
 
         int expectedWidth = width / inSampleSize;
 
         if (expectedWidth > reqWidth) {
             //if(Math.round((float)width / (float)reqWidth) > inSampleSize) // If bigger SampSize..
-            inSampleSize = Math.round((float)width / (float)reqWidth);
+            inSampleSize = Math.round((float) width / (float) reqWidth);
         }
 
         options.inSampleSize = inSampleSize;
@@ -179,7 +179,7 @@ public class MainActivity extends Activity {
         Imgproc.cvtColor(imageMat, newMat, Imgproc.COLOR_RGB2GRAY);
 
         // convert to bitmap:
-        Bitmap bm = Bitmap.createBitmap(newMat.cols(), newMat.rows(),Bitmap.Config.ARGB_8888);
+        Bitmap bm = Bitmap.createBitmap(newMat.cols(), newMat.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(newMat, bm);
 
         // find the imageview and draw it!
@@ -190,12 +190,13 @@ public class MainActivity extends Activity {
     public void buttonOnClick(View view) {
         //scanPhotos();
         Toast.makeText(this, "Scanning photos...", Toast.LENGTH_LONG).show();
-        Intent intent = new Intent(this, Gallery.class);
-
-        startActivity(intent);
-        //overridePendingTransition( R.anim.slide_in_left, R.anim.slide_out_left );
+        try {
+            Thread.sleep(50);
+            Intent intent = new Intent(this, Gallery.class);
+            startActivity(intent);
+        } catch (InterruptedException e) {
+        }
     }
-
     public void imageView1OnClick(View view) {
     }
 }

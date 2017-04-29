@@ -5,4 +5,8 @@
     <string name="title_notifications">Notifications</string>
     <string name="title_activity_gallery">Gallery</string>
     <string name="title_activity_preview">Preview</string>
+    <string name="title_logo">Logo</string>
+    <string name="image_from_camera">Camera Image</string>
+    <string name="scan_button">Scan Photos</string>
+    <string name="rotate_button">Rotate Photo</string>
 </resources>

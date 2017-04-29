@@ -18,6 +18,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import static com.team.pusto.paperassistant.MainActivity.decodeSampledBitmapFromFile;
+
 public class Preview extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 324;
     private Button button;
@@ -66,12 +68,14 @@ public class Preview extends AppCompatActivity {
         */
         Intent intent = getIntent();
         if (null != intent) {
-            Bitmap imagesrc = intent.getParcelableExtra("image");
+            String pathToImage = intent.getStringExtra("title");
+            Bitmap bmp = decodeSampledBitmapFromFile(pathToImage, 600, 600);
+            //Bitmap imagesrc = intent.getParcelableExtra("image");
             //int numberData = intent.getIntExtra(KEY, defaultValue);
             //boolean booleanData = intent.getBooleanExtra(KEY, defaultValue);
             //char charData = intent.getCharExtra(KEY, defaultValue);
             ImageView previewImage = (ImageView) findViewById(R.id.imageView2);
-            previewImage.setImageBitmap(imagesrc);
+            previewImage.setImageBitmap(bmp);
         }
 
         button = (Button) findViewById(R.id.button3);
@@ -80,11 +84,15 @@ public class Preview extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = getIntent();
                 if (null != intent) {
-                    Bitmap imagesrc = intent.getParcelableExtra("image");
+                    if (bmp == null) {
+                        String pathToImage = intent.getStringExtra("title");
+                        bmp = decodeSampledBitmapFromFile(pathToImage, 600, 600);
+                    }
 
                     Matrix matrix = new Matrix();
                     matrix.postRotate(90);
-                    Bitmap rotatedsrc = Bitmap.createBitmap(imagesrc, 0, 0, imagesrc.getWidth(), imagesrc.getHeight(), matrix, true);
+                    Bitmap rotatedsrc = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
+                    bmp = rotatedsrc;
                     //int numberData = intent.getIntExtra(KEY, defaultValue);
                     //boolean booleanData = intent.getBooleanExtra(KEY, defaultValue);
                     //char charData = intent.getCharExtra(KEY, defaultValue);
@@ -94,5 +102,6 @@ public class Preview extends AppCompatActivity {
             }
         });
     }
+    Bitmap bmp;
 
 }

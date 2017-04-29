@@ -10,6 +10,7 @@
 
 
     <ImageView
+        android:contentDescription="@string/image_from_camera"
         android:id="@+id/image"
         android:layout_width="100dp"
         android:layout_height="100dp"
