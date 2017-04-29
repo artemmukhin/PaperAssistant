@@ -188,7 +188,7 @@ public class MainActivity extends Activity {
     }
 
     public void buttonOnClick(View view) {
-        scanPhotos();
+        //scanPhotos();
         Intent intent = new Intent(this, Gallery.class);
         startActivity(intent);
     }

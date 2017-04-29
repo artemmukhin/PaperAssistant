@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.widget.GridView;
 
 import com.team.pusto.paperassistant.classifierengine.Classifier;
 
@@ -27,6 +28,8 @@ public class MyAsyncTask<Params, Progress, Result> extends
     private ProgressDialog mDialog = null;
     public ArrayList<File> paperFiles;
     public ArrayList<ImageItem> imageItems;
+    public Context context;
+    public GridView gridView;
 
     private void setDialog(Context context) {
         this.mDialog = new ProgressDialog(context);
@@ -34,10 +37,11 @@ public class MyAsyncTask<Params, Progress, Result> extends
         this.mDialog.setCancelable(false);
     }
 
-    public MyAsyncTask(Context context, ArrayList<File> files, ArrayList<ImageItem> ii) {
+    public MyAsyncTask(Context context, ArrayList<File> files, ArrayList<ImageItem> ii, GridView gridView) {
         this.setDialog(context);
         this.paperFiles = files;
         this.imageItems = ii;
+        this.gridView = gridView;
     }
 
     @Override
@@ -56,13 +60,14 @@ public class MyAsyncTask<Params, Progress, Result> extends
             ArrayList<File> files = new ArrayList<>();
             for (File file : allFiles) {
                 String name = file.getName();
-                if (name.indexOf(".jpg") > 0 || name.indexOf(".JPG") > 0)
+                if (name.toUpperCase().indexOf(".JPG") > 0)
                     files.add(file);
             }
 
             Classifier classifier = new Classifier();
             classifier.addPhotos(files);
             paperFiles = classifier.getPapers();
+            paperFiles = files;
 
             if (paperFiles == null) {
                 Bitmap.Config conf = Bitmap.Config.ARGB_8888;
@@ -84,6 +89,7 @@ public class MyAsyncTask<Params, Progress, Result> extends
     @Override
     protected void onPostExecute(Result result) {
         // Update the UI if u need to
+        ((GridViewAdapter)gridView.getAdapter()).notifyDataSetChanged();
 
         // And then dismiss the dialog
         if (this.mDialog.isShowing()) {

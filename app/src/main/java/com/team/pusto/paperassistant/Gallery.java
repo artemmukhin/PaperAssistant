@@ -98,10 +98,11 @@ public class Gallery extends AppCompatActivity {
     @Override
     protected void onResume(){
         super.onResume();
+
     }
 
     private void getData() {
-        MyAsyncTask<Void, Void, Void> updateTask = new MyAsyncTask<Void, Void, Void>(context, paperFiles, imageItems);
+        MyAsyncTask<Void, Void, Void> updateTask = new MyAsyncTask<Void, Void, Void>(context, paperFiles, imageItems, gridView);
         updateTask.execute();
     }
     private ImageItem getItem(int i) {
