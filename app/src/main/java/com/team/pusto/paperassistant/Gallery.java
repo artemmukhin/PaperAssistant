@@ -154,7 +154,7 @@ public class Gallery extends AppCompatActivity {
             if (item.getTitle().equals("Rotate")){
                 rotatePhotos(mode);
             }
-            if (item.getTitle().equals("Extract")){
+            if (item.getTitle().equals("Apply")){
                 extractPhotos(mode);
             }
             if (item.getTitle().equals("Exclude")){
@@ -175,6 +175,7 @@ public class Gallery extends AppCompatActivity {
             for (int i = 0; i < imageItems.size(); i++) {
                 if (booleanArray.get(i)) {
                     ImageItem ii = imageItems.get(i);
+
                     Bitmap rotatedsrc = Bitmap.createBitmap(ii.getImage()
                             , 0, 0
                             , ii.getImage().getWidth()
@@ -193,14 +194,16 @@ public class Gallery extends AppCompatActivity {
                 String sourcePath = imItem.getTitle();
                 File source = new File(sourcePath);
 
-                File descPath = new File(Environment.getExternalStorageDirectory(), "/DCIM/Camera/papers"
+                File descPath = new File(Environment.getExternalStorageDirectory(), "/DCIM/Papers"
                  + sourcePath.substring(sourcePath.lastIndexOf('/')));
                 try {
-                    FileUtils.copyDirectory(source, descPath);
+                    FileUtils.copyFile(source, descPath);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
             }
+            finish();
 
             //File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Camera/papers");
             //for(File file: paperFiles){
