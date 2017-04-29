@@ -19,15 +19,20 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.team.pusto.paperassistant.classifierengine.Classifier;
-import com.team.pusto.paperassistant.classifierengine.ListAdapter;
+//import com.team.pusto.paperassistant.classifierengine.ListAdapter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -69,7 +74,72 @@ public class Gallery extends AppCompatActivity {
         gridView = (GridView) findViewById(R.id.gridView);
         //imageItems = new ArrayList<>();
         gridAdapter = new GridViewAdapter(this, R.layout.grid_item_layout, imageItems);
+
         gridView.setAdapter(gridAdapter);
+        gridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
+        gridView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                // TODO Auto-generated method stub
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                // TODO Auto-generated method stub
+
+                mode.setTitle("One item selected");
+                return true;
+
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                // TODO Auto-generated method stub
+
+
+                int selectCount = gridView.getCheckedItemCount();
+                switch (selectCount) {
+                    case 1:
+                        mode.setTitle("One item selected");
+
+                        break;
+                    default:
+                        mode.setTitle("" + selectCount + " items selected");
+
+                        break;
+                }
+
+                return true;
+            }
+
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position,
+                                                  long id, boolean checked) {
+                // TODO Auto-generated method stub
+
+
+
+                int selectCount = gridView.getCheckedItemCount();
+                switch (selectCount) {
+                    case 1:
+                        mode.setTitle("One item selected");
+                        break;
+                    default:
+                        mode.setTitle("" + selectCount + " items selected");
+                        break;
+                }
+
+            }
+        });
+
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -86,7 +156,7 @@ public class Gallery extends AppCompatActivity {
         });
         getData();
         //ImageView imageView = (ImageView) findViewById(R.id.ImageView);
-
+/*
         gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -94,6 +164,7 @@ public class Gallery extends AppCompatActivity {
                 return true;
             }
         });
+        */
     }
 
     Thread thread;
@@ -174,4 +245,5 @@ public class Gallery extends AppCompatActivity {
         File file = files.get(i);
         return file.getName();
     }
+
 }
