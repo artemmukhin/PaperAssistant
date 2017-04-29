@@ -188,14 +188,9 @@ public class MainActivity extends Activity {
     }
 
     public void buttonOnClick(View view) {
-        //scanPhotos();
-        Toast.makeText(this, "Scanning photos...", Toast.LENGTH_LONG).show();
-        try {
-            Thread.sleep(50);
-            Intent intent = new Intent(this, Gallery.class);
-            startActivity(intent);
-        } catch (InterruptedException e) {
-        }
+        scanPhotos();
+        Intent intent = new Intent(this, Gallery.class);
+        startActivity(intent);
     }
     public void imageView1OnClick(View view) {
     }

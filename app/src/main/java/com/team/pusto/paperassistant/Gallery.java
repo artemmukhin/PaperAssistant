@@ -2,6 +2,7 @@ package com.team.pusto.paperassistant;
 
 import android.Manifest;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -37,11 +38,13 @@ public class Gallery extends AppCompatActivity {
     public GridViewAdapter gridAdapter;
     static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 324;
     public ArrayList<File> paperFiles;
+    private Context context = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
+        this.context = this;
 
         //Debug.waitForDebugger();
 
@@ -90,71 +93,16 @@ public class Gallery extends AppCompatActivity {
         getData();
     }
 
-    Thread thread;
-    final ArrayList<ImageItem> imageItems = new ArrayList<>();
+    public ArrayList<ImageItem> imageItems= new ArrayList<>();
 
     @Override
     protected void onResume(){
         super.onResume();
-        if (thread.isAlive()) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-            }
-        }
-
-        gridAdapter.notifyDataSetChanged();
-        gridView.invalidateViews();
     }
 
     private void getData() {
-
-//        Thread thread = new Thread() {
-//            @Override
-//            public void run() {
-//
-//            }
-//        };
-
-        thread = new Thread(new Runnable() {
-            public void run() {
-                //Debug.waitForDebugger();
-                File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Camera");
-
-                ArrayList<File> allFiles = new ArrayList<>(Arrays.asList(photosDir.listFiles()));
-                ArrayList<File> files = new ArrayList<>();
-                for (File file : allFiles) {
-                    String name = file.getName();
-                    files.add(file);
-                }
-
-                Classifier classifier = new Classifier();
-                classifier.addPhotos(files);
-                paperFiles = classifier.getPapers();
-
-                if (paperFiles.size() == 0) {
-                    Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
-                    Bitmap bmp = Bitmap.createBitmap(200, 200, conf); // this creates a MUTABLE bitmap;
-                    imageItems.add(new ImageItem(bmp, "Images are not found!"));
-                } else {
-                    //paperFiles.size()
-                    for (int i = 0; i < paperFiles.size(); i++) {
-                        Bitmap bmp = decodeSampledBitmapFromFile(files.get(i).getAbsolutePath(), 200, 200);
-                        if (files.get(i).getName().indexOf(".jpg") > 0 || files.get(i).getName().indexOf(".JPG") > 0)
-                            imageItems.add(new ImageItem(bmp, "Image#" + i));
-                        //gridAdapter.notifyDataSetChanged();
-//                        gridView.post(new Runnable() {
-//                            public void run() {
-//                                Debug.waitForDebugger();
-//                                gridView.setAdapter(gridAdapter);
-//                            }
-//                        });
-                    }
-                }
-            }
-        });
-
-        thread.start();
+        MyAsyncTask<Void, Void, Void> updateTask = new MyAsyncTask<Void, Void, Void>(context, paperFiles, imageItems);
+        updateTask.execute();
     }
     private ImageItem getItem(int i) {
         Bitmap bmp = decodeSampledBitmapFromFile(paperFiles.get(i).getAbsolutePath(), 600, 600);
@@ -238,6 +186,10 @@ public class Gallery extends AppCompatActivity {
 
         private void extractPhotos(ActionMode mode){
             mode.setTitle("Extracting...");
+            File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Camera/papers");
+            for(File file: paperFiles){
+                file.renameTo(new File(photosDir.getAbsoluteFile() + file.getName()));
+            }
         }
 
         private void excludePhotos(ActionMode mode){
@@ -269,7 +221,6 @@ public class Gallery extends AppCompatActivity {
                     mode.setTitle("" + selectCount + " items selected");
                     break;
             }
-
         }
     }
 }
