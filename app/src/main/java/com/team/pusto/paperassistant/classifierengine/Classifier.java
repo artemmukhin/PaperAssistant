@@ -1,6 +1,11 @@
 package com.team.pusto.paperassistant.classifierengine;
 
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Rect;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,9 +38,38 @@ public class Classifier {
         List<File> papers = new ArrayList<>();
         for (Photo photo: photos) {
             Mat image = photo.getImageMat();
-            HSVHistogram histogram = new HSVHistogram(image);
-            if (isHistogramPaper(histogram))
-                papers.add(photo.getFile());
+            String fileName = photo.getFile().getName();
+
+            int width = image.width();
+            int height = image.height();
+            Rect roi = new Rect((int) (width / 8.0),
+                                (int) (height / 8.0),
+                                (int) ((6.0/8.0) * width),
+                                (int) ((6.0/8.0) * height));
+
+            Mat cropped = new Mat(image, roi);
+            HSVHistogram histogram = new HSVHistogram(cropped, fileName);
+
+            //    imageSmallCenter = image[height // 4: (3 * height) // 4, width // 4: (3 * width) // 4]
+
+            roi = new Rect((int) (width / 4.0),
+                            (int) (height / 4.0),
+                            (int) ((2.0/4.0) * width),
+                            (int) ((2.0/4.0) * height));
+
+            Mat doubleCropped = new Mat(image, roi);
+            Mat blurred = new Mat();
+            Imgproc.cvtColor(doubleCropped, blurred, Imgproc.COLOR_RGB2GRAY);
+            Imgproc.GaussianBlur(blurred, blurred, new Size(3, 3) , 0);
+            Imgproc.threshold(blurred, blurred, 60, 255, Imgproc.THRESH_BINARY);
+            blurred.convertTo(blurred, CvType.CV_8UC1);
+            List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+            Imgproc.findContours(blurred, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+
+            if (contours.size() < 6) {
+                if (isHistogramPaper(histogram))
+                    papers.add(photo.getFile());
+            }
         }
         return papers;
     }
@@ -49,7 +83,8 @@ public class Classifier {
 
         ObjectInputStream oin = new ObjectInputStream(fis);
         HistogramsArray histogramsArray = (HistogramsArray) oin.readObject();
-        //oin.close();
+        oin.close();
+
         if (isPaper)
             this.indexedPapers = histogramsArray;
         else

@@ -35,7 +35,8 @@ public class Indexer {
 
         for (Photo photo: photos) {
             Mat image = photo.getImageMat();
-            HSVHistogram histogram = new HSVHistogram(image);
+            String fileName = photo.getFile().getName();
+            HSVHistogram histogram = new HSVHistogram(image, fileName);
             histogram.setCheck(isPaper);
 
             histograms.add(histogram);

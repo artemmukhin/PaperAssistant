@@ -151,12 +151,34 @@ public class MainActivity extends Activity {
         indexerNotPaper.index();
     }
 
+    // bins = 256
+    // 25/36 paper3
+    // 13/50 notpaper6
+
+    // bins = 64
+    // 23/36 paper3        vs   24/36 on cropped
+    // 5/50 notpaper6      vs   9/50               vs   6/50 on contours
+
+    // bins = 32
+    // 19/36 paper3
+    // /50 notpaper6
+
+    // bins = 128
+    // 23/36 paper3
+    // 8/50 notpaper6
+
     public void doScience() {
-        File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM");
+        File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/papers3");
         ArrayList<File> filesAll = new ArrayList<File>(Arrays.asList(photosDir.listFiles()));
         //List<File> files = filesAll.subList(0, 5);
         List<File> files = filesAll;
 
+        List<File> needFileList = new ArrayList<>();
+        for (File file: files) {
+            if (file.getName().indexOf(".jpg") > 0 || file.getName().indexOf(".JPG") > 0)
+                needFileList.add(file);
+        }
+        /*
         File needFile = null;
         for (File file: files) {
             if (file.getName().equals("IMG1.jpg")) {
@@ -167,7 +189,7 @@ public class MainActivity extends Activity {
 
         List<File> needFileList = new ArrayList<>();
         needFileList.add(needFile);
-
+*/
         Classifier classifier = new Classifier();
         classifier.addPhotos(needFileList);
 
@@ -188,13 +210,8 @@ public class MainActivity extends Activity {
         Toast.makeText(this, "get", Toast.LENGTH_SHORT).show();
 
         List<File> paperFiles = classifier.getPapers();
-        String s;
-        if (paperFiles.size() == 1)
-            s = "Paper";
-        else
-            s = "Not paper";
-
-        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
+        String s = "all: " + needFileList.size() + ".  paper: " + paperFiles.size();
+        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
 
         //Classifier classifier = new Classifier();
         //classifier.addPhotos(files);

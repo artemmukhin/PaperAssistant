@@ -20,15 +20,18 @@ public class HSVHistogram implements java.io.Serializable {
     boolean isChecked = false;
     Boolean isPaper = null;
 
-    public HSVHistogram(Mat image) {
-        Imgproc.cvtColor(image, image, Imgproc.COLOR_RGB2HSV);
+    String fileName;
 
+    public HSVHistogram(Mat image, String fileName) {
+        this.fileName = fileName;
+
+        Imgproc.cvtColor(image, image, Imgproc.COLOR_RGB2HSV);
         List<Mat> planes = new ArrayList<Mat>();
         Core.split(image, planes);
 
-        MatOfInt channels = new MatOfInt();
+        MatOfInt channels = new MatOfInt(0);
         Mat mask = new Mat();
-        final MatOfInt histSize = new MatOfInt(256);
+        final MatOfInt histSize = new MatOfInt(64);
         final MatOfFloat histRange = new MatOfFloat(0f, 256f);
 
         Mat firstHist = new Mat();
