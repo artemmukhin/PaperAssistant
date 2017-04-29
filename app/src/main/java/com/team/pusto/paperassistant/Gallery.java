@@ -21,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.ActionMode;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -96,6 +97,7 @@ public class Gallery extends AppCompatActivity {
                 // TODO Auto-generated method stub
 
                 mode.setTitle("One item selected");
+                menu.add(1,1,1,"Rotate");
                 return true;
 
             }
@@ -109,11 +111,9 @@ public class Gallery extends AppCompatActivity {
                 switch (selectCount) {
                     case 1:
                         mode.setTitle("One item selected");
-
                         break;
                     default:
                         mode.setTitle("" + selectCount + " items selected");
-
                         break;
                 }
 
