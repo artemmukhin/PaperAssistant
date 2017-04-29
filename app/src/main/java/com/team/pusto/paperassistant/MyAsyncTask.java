@@ -28,7 +28,8 @@ public class MyAsyncTask<Params, Progress, Result> extends
     private ProgressDialog mDialog = null;
     public ArrayList<File> paperFiles;
     public ArrayList<ImageItem> imageItems;
-    public Context context;
+    public Context contextDialog;
+    public Context contextClassifier;
     public GridView gridView;
 
     private void setDialog(Context context) {
@@ -37,8 +38,10 @@ public class MyAsyncTask<Params, Progress, Result> extends
         this.mDialog.setCancelable(false);
     }
 
-    public MyAsyncTask(Context context, ArrayList<File> files, ArrayList<ImageItem> ii, GridView gridView) {
-        this.setDialog(context);
+    public MyAsyncTask(Context contextDialog, Context contextCl, ArrayList<File> files, ArrayList<ImageItem> ii, GridView gridView) {
+        this.setDialog(contextDialog);
+        this.contextDialog = contextDialog;
+        this.contextClassifier = contextCl;
         this.paperFiles = files;
         this.imageItems = ii;
         this.gridView = gridView;
@@ -54,7 +57,8 @@ public class MyAsyncTask<Params, Progress, Result> extends
         // Place your background executed method here
         try {
             //Thread.sleep(2000);
-            File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Camera");
+            boolean isEqualContexts = contextClassifier == contextDialog;
+            File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/PaperAssistant");
 
             ArrayList<File> allFiles = new ArrayList<>(Arrays.asList(photosDir.listFiles()));
             ArrayList<File> files = new ArrayList<>();
@@ -65,9 +69,11 @@ public class MyAsyncTask<Params, Progress, Result> extends
             }
 
             Classifier classifier = new Classifier();
+            classifier.loadIndexStore(contextClassifier, true);
+            classifier.loadIndexStore(contextClassifier, false);
             classifier.addPhotos(files);
             paperFiles = classifier.getPapers();
-            paperFiles = files;
+            //paperFiles = files;
 
             if (paperFiles == null) {
                 Bitmap.Config conf = Bitmap.Config.ARGB_8888;
@@ -75,8 +81,8 @@ public class MyAsyncTask<Params, Progress, Result> extends
                 imageItems.add(new ImageItem(bmp, "Images are not found!"));
             } else {
                 for (int i = 0; i < paperFiles.size(); i++) {
-                    Bitmap bmp = decodeSampledBitmapFromFile(files.get(i).getAbsolutePath(), 200, 200);
-                    imageItems.add(new ImageItem(bmp, "Image#" + i));
+                    Bitmap bmp = decodeSampledBitmapFromFile(paperFiles.get(i).getAbsolutePath(), 200, 200);
+                    imageItems.add(new ImageItem(bmp, paperFiles.get(i).getAbsolutePath()));
                 }
             }
         } catch (Exception e) {
@@ -90,7 +96,7 @@ public class MyAsyncTask<Params, Progress, Result> extends
     protected void onPostExecute(Result result) {
         // Update the UI if u need to
         ((GridViewAdapter)gridView.getAdapter()).notifyDataSetChanged();
-
+        ((Gallery)contextDialog).paperFiles = this.paperFiles;
         // And then dismiss the dialog
         if (this.mDialog.isShowing()) {
             this.mDialog.dismiss();

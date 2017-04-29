@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.team.pusto.paperassistant.classifierengine.Classifier;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -38,7 +39,7 @@ public class Gallery extends AppCompatActivity {
     public GridViewAdapter gridAdapter;
     static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 324;
     public ArrayList<File> paperFiles;
-    private Context context = null;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,21 +103,19 @@ public class Gallery extends AppCompatActivity {
     }
 
     private void getData() {
-        MyAsyncTask<Void, Void, Void> updateTask = new MyAsyncTask<Void, Void, Void>(context, paperFiles, imageItems, gridView);
+        MyAsyncTask<Void, Void, ArrayList<File>> updateTask = new MyAsyncTask<Void, Void, ArrayList<File>>(context, getApplicationContext(), paperFiles, imageItems, gridView);
         updateTask.execute();
     }
     private ImageItem getItem(int i) {
         Bitmap bmp = decodeSampledBitmapFromFile(paperFiles.get(i).getAbsolutePath(), 600, 600);
         ImageItem im = new ImageItem(bmp, paperFiles.get(i).getAbsolutePath());
-        Toast.makeText(this, getFileName(i), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, getFileName(i), Toast.LENGTH_SHORT).show();
         return im;
     }
     private String getFileName(int i) {
         File file = paperFiles.get(i);
         return file.getName();
     }
-
-
 
     private class MyMultiChoiceModeListener implements MultiChoiceModeListener {
 
@@ -139,7 +138,7 @@ public class Gallery extends AppCompatActivity {
             mode.setTitle("One item selected");
             SubMenu subMenu = menu.addSubMenu("Menu");
             subMenu.add("Rotate");
-            subMenu.add("Extract");
+            subMenu.add("Apply");
             subMenu.add("Exclude");
             return true;
 
@@ -186,11 +185,25 @@ public class Gallery extends AppCompatActivity {
         }
 
         private void extractPhotos(ActionMode mode){
-            mode.setTitle("Extracting...");
-            File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Camera/papers");
-            for(File file: paperFiles){
-                file.renameTo(new File(photosDir.getAbsoluteFile() + file.getName()));
+            mode.setTitle("Applying...");
+
+            for(ImageItem imItem: imageItems) {
+                String sourcePath = imItem.getTitle();
+                File source = new File(sourcePath);
+
+                File descPath = new File(Environment.getExternalStorageDirectory(), "/DCIM/Camera/papers"
+                 + sourcePath.substring(sourcePath.lastIndexOf('/')));
+                try {
+                    FileUtils.copyDirectory(source, descPath);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+
+            //File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Camera/papers");
+            //for(File file: paperFiles){
+                //file.renameTo(new File(photosDir.getAbsoluteFile() + file.getName()));
+            //}
         }
 
         private void excludePhotos(ActionMode mode){
@@ -200,7 +213,7 @@ public class Gallery extends AppCompatActivity {
             while (i >= 0){
                 if (booleanArray.get(i)){
                     imageItems.remove(i);
-                    paperFiles.remove(i);
+                    //paperFiles.remove(i);
                 }
                 i--;
             }

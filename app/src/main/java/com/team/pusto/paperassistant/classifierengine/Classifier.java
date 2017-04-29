@@ -81,9 +81,9 @@ public class Classifier {
         InputStream is;
 
         if (isPaper)
-            is = am.open("paper_store.uu");
+            is = am.open("paper_store");
         else
-            is = am.open("notpaper_store.uu");
+            is = am.open("notpaper_store");
 
         ObjectInputStream oin = new ObjectInputStream(is);
         HistogramsArray histogramsArray = (HistogramsArray) oin.readObject();
