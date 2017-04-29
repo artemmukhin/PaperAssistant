@@ -1,5 +1,12 @@
 package com.team.pusto.paperassistant.classifierengine;
 
+import android.content.Context;
+import android.content.res.AssetManager;
+import android.net.Uri;
+
+import com.team.pusto.paperassistant.MainActivity;
+import com.team.pusto.paperassistant.R;
+
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -10,6 +17,7 @@ import org.opencv.imgproc.Imgproc;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,14 +82,17 @@ public class Classifier {
         return papers;
     }
 
-    public void loadIndexStore(boolean isPaper) throws IOException, ClassNotFoundException {
-        FileInputStream fis;
-        if (isPaper)
-            fis = new FileInputStream(Indexer.indexPaperStorePath);
-        else
-            fis = new FileInputStream(Indexer.indexNotPaperStorePath);
 
-        ObjectInputStream oin = new ObjectInputStream(fis);
+    public void loadIndexStore(Context myContext, boolean isPaper) throws IOException, ClassNotFoundException {
+        AssetManager am = myContext.getAssets();
+        InputStream is;
+
+        if (isPaper)
+            is = am.open("paper_store.uu");
+        else
+            is = am.open("notpaper_store.uu");
+
+        ObjectInputStream oin = new ObjectInputStream(is);
         HistogramsArray histogramsArray = (HistogramsArray) oin.readObject();
         oin.close();
 

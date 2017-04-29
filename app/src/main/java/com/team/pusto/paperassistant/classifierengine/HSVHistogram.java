@@ -16,6 +16,7 @@ public class HSVHistogram implements java.io.Serializable {
     private float[] firstHist;
     private float[] secondHist;
     private float[] thirdHist;
+    //private float[] fourthHist;
 
     boolean isChecked = false;
     Boolean isPaper = null;
@@ -25,18 +26,19 @@ public class HSVHistogram implements java.io.Serializable {
     public HSVHistogram(Mat image, String fileName) {
         this.fileName = fileName;
 
-        Imgproc.cvtColor(image, image, Imgproc.COLOR_RGB2HSV);
+        //Imgproc.cvtColor(image, image, Imgproc.COLOR_RGB2HSV);
         List<Mat> planes = new ArrayList<Mat>();
         Core.split(image, planes);
 
         MatOfInt channels = new MatOfInt(0);
         Mat mask = new Mat();
-        final MatOfInt histSize = new MatOfInt(64);
+        final MatOfInt histSize = new MatOfInt(8);
         final MatOfFloat histRange = new MatOfFloat(0f, 256f);
 
         Mat firstHist = new Mat();
         Mat secondHist = new Mat();
         Mat thirdHist = new Mat();
+        //Mat fourthHist = new Mat();
 
         image.convertTo(image, CvType.CV_32F);
 
@@ -49,13 +51,18 @@ public class HSVHistogram implements java.io.Serializable {
         List<Mat> thirdPlaneAsList = new ArrayList<>();
         thirdPlaneAsList.add(planes.get(2));
 
+        //List<Mat> fourthPlaneAsList = new ArrayList<>();
+        //fourthPlaneAsList.add(planes.get(3));
+
         Imgproc.calcHist(firstPlaneAsList, channels, mask, firstHist, histSize, histRange);
         Imgproc.calcHist(secondPlaneAsList, channels, mask, secondHist, histSize, histRange);
         Imgproc.calcHist(thirdPlaneAsList, channels, mask, thirdHist, histSize, histRange);
+        //Imgproc.calcHist(fourthPlaneAsList, channels, mask, fourthHist, histSize, histRange);
 
         Core.normalize(firstHist, firstHist);
         Core.normalize(secondHist, secondHist);
         Core.normalize(thirdHist, thirdHist);
+        //Core.normalize(fourthHist, fourthHist);
 
         float[] histFloat1 = new float[firstHist.cols() * firstHist.rows() * (int) firstHist.elemSize()];
         firstHist.get(0, 0, histFloat1);
@@ -66,14 +73,17 @@ public class HSVHistogram implements java.io.Serializable {
         float[] histFloat3 = new float[thirdHist.cols() * thirdHist.rows() * (int) thirdHist.elemSize()];
         thirdHist.get(0, 0, histFloat3);
 
+        //float[] histFloat4 = new float[fourthHist.cols() * fourthHist.rows() * (int) fourthHist.elemSize()];
+        //fourthHist.get(0, 0, histFloat4);
+
         this.firstHist = histFloat1;
         this.secondHist = histFloat2;
         this.thirdHist = histFloat3;
+        //this.fourthHist = histFloat4;
     }
 
+    // chi-squared distance
     public static double distanceBetweenHistograms(HSVHistogram h1, HSVHistogram h2) {
-        // 0.5 * np.sum([((a - b) ** 2) / (a + b + eps) for (a, b) in zip(histA, histB)])
-
         double d1 = 0.0;
         for (int i = 0; i < h1.firstHist.length; i++) {
             double diff = (h1.firstHist[i] - h2.firstHist[i]) * (h1.firstHist[i] - h2.firstHist[i]) / (h1.firstHist[i] + h2.firstHist[i]);
@@ -94,9 +104,17 @@ public class HSVHistogram implements java.io.Serializable {
             if (Math.abs(diff) > HSVHistogram.EPS)
                 d3 += diff;
         }
-        
+
+        /*
+        double d4 = 0.0;
+        for (int i = 0; i < h1.fourthHist.length; i++) {
+            double diff = (h1.fourthHist[i] - h2.fourthHist[i]) * (h1.fourthHist[i] - h2.fourthHist[i]) / (h1.fourthHist[i] + h2.fourthHist[i]);
+            if (Math.abs(diff) > HSVHistogram.EPS)
+                d4 += diff;
+        }
+        */
+
         return d1 + d2 + d3;
-        // compareHist(h1.firstHist, h2.firstHist, Imgproc.CV_COMP_CHISQR);
     }
 
     public void setCheck(boolean isPaper) {

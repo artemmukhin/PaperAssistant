@@ -151,21 +151,10 @@ public class MainActivity extends Activity {
         indexerNotPaper.index();
     }
 
-    // bins = 256
-    // 25/36 paper3
-    // 13/50 notpaper6
-
     // bins = 64
-    // 23/36 paper3        vs   24/36 on cropped
-    // 5/50 notpaper6      vs   9/50               vs   6/50 on contours
+    // 24/36 on contours   vs     31/36  rgba
+    // 6/50 on contours    vs     3/50   rgba
 
-    // bins = 32
-    // 19/36 paper3
-    // /50 notpaper6
-
-    // bins = 128
-    // 23/36 paper3
-    // 8/50 notpaper6
 
     public void doScience() {
         File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/papers3");
@@ -194,8 +183,8 @@ public class MainActivity extends Activity {
         classifier.addPhotos(needFileList);
 
         try {
-            classifier.loadIndexStore(true);
-            classifier.loadIndexStore(false);
+            classifier.loadIndexStore(this, true);
+            classifier.loadIndexStore(this, false);
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(this, "Exc", Toast.LENGTH_SHORT).show();
