@@ -1,12 +1,12 @@
 package com.team.pusto.paperassistant;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import android.Manifest;
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -21,7 +21,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.team.pusto.paperassistant.classifierengine.Classifier;
-import com.team.pusto.paperassistant.classifierengine.Indexer;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
@@ -117,14 +116,14 @@ public class MainActivity extends Activity {
         int inSampleSize = 1;
 
         if (height > reqHeight) {
-            inSampleSize = Math.round((float)height / (float)reqHeight);
+            inSampleSize = Math.round((float) height / (float) reqHeight);
         }
 
         int expectedWidth = width / inSampleSize;
 
         if (expectedWidth > reqWidth) {
             //if(Math.round((float)width / (float)reqWidth) > inSampleSize) // If bigger SampSize..
-            inSampleSize = Math.round((float)width / (float)reqWidth);
+            inSampleSize = Math.round((float) width / (float) reqWidth);
         }
 
         options.inSampleSize = inSampleSize;
@@ -135,98 +134,20 @@ public class MainActivity extends Activity {
         return BitmapFactory.decodeFile(path, options);
     }
 
-    public void doScienceIndex() {
-        File papersDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Papers");
-        ArrayList<File> filesPapers = new ArrayList<File>(Arrays.asList(papersDir.listFiles()));
-
-        File notPapersDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/NotPapers");
-        ArrayList<File> filesNotPapers = new ArrayList<File>(Arrays.asList(notPapersDir.listFiles()));
-
-        Indexer indexerPaper = new Indexer(true);
-        indexerPaper.addPhotos(filesPapers);
-        indexerPaper.index();
-
-        Indexer indexerNotPaper = new Indexer(false);
-        indexerNotPaper.addPhotos(filesNotPapers);
-        indexerNotPaper.index();
-    }
-
-    // bins = 64
-    // 24/36 on contours   vs     31/36  rgba
-    // 6/50 on contours    vs     3/50   rgba
+    public void scanPhotos() {
+        File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/Camera");
+        ArrayList<File> files = new ArrayList<File>(Arrays.asList(photosDir.listFiles()));
 
 
-    public void doScience() {
-        File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/papers3");
-        ArrayList<File> filesAll = new ArrayList<File>(Arrays.asList(photosDir.listFiles()));
-        //List<File> files = filesAll.subList(0, 5);
-        List<File> files = filesAll;
-
-        List<File> needFileList = new ArrayList<>();
-        for (File file: files) {
-            if (file.getName().indexOf(".jpg") > 0 || file.getName().indexOf(".JPG") > 0)
-                needFileList.add(file);
-        }
-        /*
-        File needFile = null;
-        for (File file: files) {
-            if (file.getName().equals("IMG1.jpg")) {
-                needFile = file;
-                break;
-            }
-        }
-
-        List<File> needFileList = new ArrayList<>();
-        needFileList.add(needFile);
-*/
         Classifier classifier = new Classifier();
-        classifier.addPhotos(needFileList);
-
-        try {
-            classifier.loadIndexStore(this, true);
-            classifier.loadIndexStore(this, false);
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Exc", Toast.LENGTH_SHORT).show();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Exc", Toast.LENGTH_SHORT).show();
-        }
-        finally {
-            Toast.makeText(this, "finally", Toast.LENGTH_SHORT).show();
-        }
-
-        Toast.makeText(this, "get", Toast.LENGTH_SHORT).show();
-
-        List<File> paperFiles = classifier.getPapers();
-        String s = "all: " + needFileList.size() + ".  paper: " + paperFiles.size();
-        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
-
-        //Classifier classifier = new Classifier();
         //classifier.addPhotos(files);
-        //List<File> paperFiles = classifier.getPapers();
+        //ArrayList<File> paperFiles = classifier.getPapers();
+        ArrayList<File> paperFiles = files;
 
-        /*
-        Indexer indexer = new Indexer(true);
-        indexer.addPhotos(files);
-        indexer.index();
-        */
-
-/*
-        Classifier classifier = new Classifier();
-        try {
-            classifier.loadIndexStore(true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-*/
-/*
         Bitmap bmp = decodeSampledBitmapFromFile(files.get(0).getAbsolutePath(), 200, 200);
         Mat imageMat = new Mat();
         Utils.bitmapToMat(bmp, imageMat);
-*/
+
         /*
         InputStream stream = null;
         Uri path = Uri.parse("android.resource://com.team.pusto.paperassistant/" + R.drawable.not32);
@@ -254,21 +175,28 @@ public class MainActivity extends Activity {
         */
 
         // do smth with mat
-        /*
         Mat newMat = new Mat();
         Imgproc.cvtColor(imageMat, newMat, Imgproc.COLOR_RGB2GRAY);
 
         // convert to bitmap:
-        Bitmap bm = Bitmap.createBitmap(newMat.cols(), newMat.rows(),Bitmap.Config.ARGB_8888);
+        Bitmap bm = Bitmap.createBitmap(newMat.cols(), newMat.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(newMat, bm);
 
         // find the imageview and draw it!
         ImageView iv = (ImageView) findViewById(R.id.imageView1);
         iv.setImageBitmap(bm);
-        */
     }
 
     public void buttonOnClick(View view) {
-        doScience();
+        //scanPhotos();
+        Toast.makeText(this, "Scanning photos...", Toast.LENGTH_LONG).show();
+        try {
+            Thread.sleep(50);
+            Intent intent = new Intent(this, Gallery.class);
+            startActivity(intent);
+        } catch (InterruptedException e) {
+        }
+    }
+    public void imageView1OnClick(View view) {
     }
 }

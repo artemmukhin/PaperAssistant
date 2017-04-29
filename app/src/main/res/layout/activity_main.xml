@@ -14,10 +14,12 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
+        <!-- todo: Put logo here -->
         <ImageView
+            android:contentDescription="@string/title_logo"
             android:id="@+id/imageView1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             app:srcCompat="@drawable/not32" />
 
     </FrameLayout>
@@ -26,15 +28,7 @@
         android:id="@+id/button1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="do science"
+        android:text="@string/scan_button"
         android:onClick="buttonOnClick"/>
-
-    <android.support.design.widget.BottomNavigationView
-        android:id="@+id/navigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="?android:attr/windowBackground"
-        app:menu="@menu/navigation" />
 
 </LinearLayout>
