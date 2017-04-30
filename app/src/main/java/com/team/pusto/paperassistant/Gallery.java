@@ -42,12 +42,18 @@ public class Gallery extends AppCompatActivity {
     static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 324;
     public ArrayList<File> paperFiles;
     private Context context;
+    private String pathToSelectedDir = Environment.getExternalStorageDirectory() + "/DCIM/PaperAssistant";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
         this.context = this;
+
+        Intent thisIntent = getIntent();
+        if (thisIntent != null) {
+            pathToSelectedDir = thisIntent.getStringExtra("pathToSelectedDir");
+        }
 
         //Debug.waitForDebugger();
 
@@ -86,11 +92,7 @@ public class Gallery extends AppCompatActivity {
 
                 //PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), (int)id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                 //Start details activity
-                try {
-                    startActivity(intent);
-                } catch (Exception e){
-                    int i = 1234;
-                }
+                startActivity(intent);
             }
         });
         getData();
@@ -105,7 +107,8 @@ public class Gallery extends AppCompatActivity {
     }
 
     private void getData() {
-        MyAsyncTask<Void, Void, ArrayList<File>> updateTask = new MyAsyncTask<Void, Void, ArrayList<File>>(context, getApplicationContext(), paperFiles, imageItems, gridView);
+        MyAsyncTask<Void, Void, ArrayList<File>> updateTask = new MyAsyncTask<>(
+                context, getApplicationContext(), paperFiles, imageItems, gridView, pathToSelectedDir);
         updateTask.execute();
     }
     private ImageItem getItem(int i) {
@@ -176,11 +179,8 @@ public class Gallery extends AppCompatActivity {
                 if (booleanArray.get(i)) {
                     ImageItem ii = imageItems.get(i);
 
-                    Bitmap rotatedsrc = Bitmap.createBitmap(ii.getImage()
-                            , 0, 0
-                            , ii.getImage().getWidth()
-                            , ii.getImage().getHeight()
-                            , matrix, true);
+                    Bitmap rotatedsrc = Bitmap.createBitmap(ii.getImage(), 0, 0,
+                            ii.getImage().getWidth(), ii.getImage().getHeight(), matrix, true);
                     imageItems.get(i).setImage(rotatedsrc);
                 }
             }

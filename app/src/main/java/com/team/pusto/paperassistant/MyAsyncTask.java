@@ -23,7 +23,7 @@ import static com.team.pusto.paperassistant.MainActivity.decodeSampledBitmapFrom
 public class MyAsyncTask<Params, Progress, Result> extends
         AsyncTask<Params, Progress, Result> {
 
-    private final String DIALOG_MESSAGE = "Updating contacts";
+    private final String DIALOG_MESSAGE = "Search for papers...";
 
     private ProgressDialog mDialog = null;
     public ArrayList<File> paperFiles;
@@ -31,6 +31,7 @@ public class MyAsyncTask<Params, Progress, Result> extends
     public Context contextDialog;
     public Context contextClassifier;
     public GridView gridView;
+    private String pathToSelectedDir;
 
     private void setDialog(Context context) {
         this.mDialog = new ProgressDialog(context);
@@ -38,13 +39,15 @@ public class MyAsyncTask<Params, Progress, Result> extends
         this.mDialog.setCancelable(false);
     }
 
-    public MyAsyncTask(Context contextDialog, Context contextCl, ArrayList<File> files, ArrayList<ImageItem> ii, GridView gridView) {
+    public MyAsyncTask(Context contextDialog, Context contextCl, ArrayList<File> files,
+                       ArrayList<ImageItem> ii, GridView gridView, String pathToSelectedDir) {
         this.setDialog(contextDialog);
         this.contextDialog = contextDialog;
         this.contextClassifier = contextCl;
         this.paperFiles = files;
         this.imageItems = ii;
         this.gridView = gridView;
+        this.pathToSelectedDir = pathToSelectedDir;
     }
 
     @Override
@@ -58,13 +61,14 @@ public class MyAsyncTask<Params, Progress, Result> extends
         try {
             //Thread.sleep(2000);
             boolean isEqualContexts = contextClassifier == contextDialog;
-            File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/PaperAssistant");
+            //File photosDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/PaperAssistant");
+            File photosDir = new File(pathToSelectedDir);
 
             ArrayList<File> allFiles = new ArrayList<>(Arrays.asList(photosDir.listFiles()));
             ArrayList<File> files = new ArrayList<>();
             for (File file : allFiles) {
                 String name = file.getName();
-                if (name.toUpperCase().indexOf(".JPG") > 0)
+                if (name.toUpperCase().indexOf(".JPG") == name.length() - ".JPG".length())
                     files.add(file);
             }
 
